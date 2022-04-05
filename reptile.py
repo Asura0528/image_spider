@@ -109,7 +109,7 @@ def download(download_name, authorization):
 
 
 if __name__ == '__main__':
-    token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvd3d3Lnp0ZW1hbi5uZXQiLCJpYXQiOjE2NDkwNDE0OTksIm5iZiI6MTY0OTA0MTQ5OSwiZXhwIjoxNjUwMjUxMDk5LCJkYXRhIjp7InVzZXIiOnsiaWQiOiIxMjUwIn19fQ.bD2shxCRt7-AAcZemwGd2NtqLeLD9fzSueA7tb5C_iw'
+    token = ''
     name = 'rioko凉凉子'
     # vip 一天只有五次
     vip_download(name, token)
