@@ -19,6 +19,7 @@ class SpiderGteman(object):
         res = requests.post(login_url, data)
         self.token = "Bearer " + json.loads(res.text).get("token")
         self.download_name = download_name
+        self.baidu_pan = BaiDuPan()
 
     def get_id_list(self) -> list:
         """
@@ -95,15 +96,20 @@ class SpiderGteman(object):
         :return: 依据登录取得token拼接而成
         """
         share_id_list = self.get_vip_id_list()
-        baidu_pan = BaiDuPan()
-        baidu_pan.create_dir('/需要下载/{}'.format(self.download_name))
+        if not self.baidu_pan.verify_file(spider_gteman):
+            self.baidu_pan.create_dir('/spider_gteman')
+        if not self.baidu_pan.verify_file(self.download_name, '/spider_gteman'):
+            self.baidu_pan.create_dir('/spider_gteman/{}'.format(self.download_name))
+        else:
+            print("已存在同名文件夹,请确认后重试")
+            return None
         if len(share_id_list) == 1:
             share_id = share_id_list[0]
         else:
             print("获取合集id失败，保存失败")
             return None
         share_url, share_code = self.get_vip_url_and_code(share_id)
-        self.save_data(share_url, share_code, self.download_name)
+        self.save_data(share_url, share_code)
 
     def download(self):
         """
@@ -111,15 +117,20 @@ class SpiderGteman(object):
         :return:
         """
         share_id_list = self.get_id_list()
-        baidu_pan = BaiDuPan()
-        baidu_pan.create_dir('/需要下载/{}'.format(self.download_name))
+        if not self.baidu_pan.verify_file(spider_gteman):
+            self.baidu_pan.create_dir('/spider_gteman')
+        if not self.baidu_pan.verify_file(self.download_name, '/spider_gteman'):
+            self.baidu_pan.create_dir('/spider_gteman/{}'.format(self.download_name))
+        else:
+            print("已存在同名文件夹,请确认后重试")
+            return None
         for share_id in share_id_list:
             share_url, share_code = self.get_url_and_code(share_id)
-            self.save_data(share_url, share_code, self.download_name)
+            self.save_data(share_url, share_code)
 
 
 if __name__ == '__main__':
-    spider_gteman = SpiderGteman("你的账号", "你的密码", "需要下载的网红名称")
+    spider_gteman = SpiderGteman("875778210@qq.com", "axlxmlt", "eliza喵喵")
     # vip 一天只有五次
     # spider_gteman.vip_download()
     spider_gteman.download()
