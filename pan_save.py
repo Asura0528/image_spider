@@ -28,9 +28,8 @@ class BaiDuPan(object):
     def __init__(self):
         # 创建session并设置初始登录Cookie
         self.session = requests.session()
-        self.session.cookies[
-            'BDUSS'] = 'J2fk0zUE1-bVpFV2FSflhJTXFrMHdydWZNZnRkRHAzOWhtVHJMRUhTVzBtWEppSUFBQUFBJCQAAAAAAAAAAAEAAADHpP6HYnpqc2RqeG5zdmRrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALQMS2K0DEtiY3'
-        self.session.cookies['STOKEN'] = '28652d33416abe4689781d499b985b196ac9dbc05db92e66b5a8fae7b0cea115'
+        self.session.cookies['BDUSS'] = ''
+        self.session.cookies['STOKEN'] = ''
         self.headers = {
             'Host': 'pan.baidu.com',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36',
