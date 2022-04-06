@@ -96,7 +96,7 @@ class SpiderGteman(object):
         :return: 依据登录取得token拼接而成
         """
         share_id_list = self.get_vip_id_list()
-        if not self.baidu_pan.verify_file(spider_gteman):
+        if not self.baidu_pan.verify_file("spider_gteman"):
             self.baidu_pan.create_dir('/spider_gteman')
         if not self.baidu_pan.verify_file(self.download_name, '/spider_gteman'):
             self.baidu_pan.create_dir('/spider_gteman/{}'.format(self.download_name))
@@ -117,7 +117,7 @@ class SpiderGteman(object):
         :return:
         """
         share_id_list = self.get_id_list()
-        if not self.baidu_pan.verify_file(spider_gteman):
+        if not self.baidu_pan.verify_file("spider_gteman"):
             self.baidu_pan.create_dir('/spider_gteman')
         if not self.baidu_pan.verify_file(self.download_name, '/spider_gteman'):
             self.baidu_pan.create_dir('/spider_gteman/{}'.format(self.download_name))
