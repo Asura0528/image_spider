@@ -81,13 +81,13 @@ class SpiderGteman(object):
 
     def save_data(self, share_url: str, share_code: str):
         """
-        百度网盘分享链接转存到自己的网盘,保存到目录：/需要下载/下载人名
+        百度网盘分享链接转存到自己的网盘,保存到目录：/spider_gteman/下载人名
         :param share_url: 分享链接
         :param share_code: 提取码
         :return:
         """
         baidu_pan = BaiDuPan()
-        info = baidu_pan.saveShare(share_url, share_code, '/需要下载/{}'.format(self.download_name))
+        info = baidu_pan.saveShare(share_url, share_code, '/spider_gteman/{}'.format(self.download_name))
         print(info)
 
     def vip_download(self):

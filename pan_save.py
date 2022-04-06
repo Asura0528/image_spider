@@ -58,7 +58,7 @@ class BaiDuPan(object):
     获取指定目录的文件列表，直接返回原始的json
     '''
 
-    def getFileList(self, dir='/', order='time', desc=0, page=1, num=100):
+    def getFileList(self, dir='/', order='time', desc=0):
         '''
         构造获取文件列表的URL：
         https://pan.baidu.com/api/list?
@@ -79,12 +79,11 @@ class BaiDuPan(object):
         '''
         # 访问首页获取bdstoken
         response = self.session.get('https://pan.baidu.com/', headers=self.headers)
-        bdstoken = re.findall(r'initPrefetch\(\'(.+?)\'\,', response.content.decode("utf-8"))[0]
         t = random.random()
         startLogTime = str(int(time.time()) * 1000)
-        url = 'https://pan.baidu.com/api/list?bdstoken=%s&dir=%s&order=%s&desc=%s&page=%s&num=%s&t=%s&startLogTime=%s\
+        url = 'https://pan.baidu.com/api/list?dir=%s&order=%s&desc=%s&t=%s&startLogTime=%s\
 				&logid=MTU4MTg2MjY0NzM3MzAuMzM2MTAzMzk5MTg3NzYyOQ==&clienttype=0&showempty=0&web=1&channel=chunlei&app_id=250528' \
-              % (bdstoken, dir, order, desc, page, num, t, startLogTime)
+              % (dir, order, desc, t, startLogTime)
         headers = self.headers
         headers['Referer'] = 'https://pan.baidu.com/disk/home?'
         response = self.session.get(url, headers=headers)
@@ -301,6 +300,7 @@ class BaiDuPan(object):
         '''
         save_res = self.session.post(save_url, headers=headers, data=form_data)
         save_json = save_res.json()
+        print(save_json)
         errno, err_msg, extra, info = (0, '转存成功', save_json['extra'], save_json['info']) if (
                 save_json['errno'] == 0) else (9, '转存失败：%d' % save_json['errno'], '', '')
         return {'errno': errno, 'err_msg': err_msg, "extra": extra, "info": info}
@@ -479,3 +479,16 @@ class BaiDuPan(object):
         response = self.session.post(url_create, data=create_floder, headers=self.headers)
         response.encoding = 'utf-8'
         print(response.content)
+
+    def verify_file(self, name: str, path: str = '/') -> bool:
+        """
+        验证文件是否存在
+        :param name: 文件名
+        :param path: 路径
+        :return: boolean 存在返回True，否则返回False
+        """
+        verify = False
+        for item in self.getFileList(dir=path).get("list"):
+            if item.get("server_filename") == name:
+                verify = True
+        return verify
