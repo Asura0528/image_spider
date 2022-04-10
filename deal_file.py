@@ -2,7 +2,7 @@ import os
 import decompress
 
 
-def deal_file(file_list_dir, data_name):
+def deal_file(file_list_dir, data_name, path):
     for file_list in file_list_dir:
         v_count = 0
         gif_count = 0
@@ -65,9 +65,3 @@ def deal_file(file_list_dir, data_name):
               "\n其他重命名：" + str(other_count) + "|" + ",".join(other_list) +
               "\n删除文件数：" + str(rm_count) + "|" + ",".join(rm_list))
         print("=====重命名文件夹" + file_dir_path + "中文件结束=====")
-
-
-if __name__ == '__main__':
-    name = 'rioko凉凉子'
-    path = r'\\192.168.0.101\39008675\我的图片\{}'.format(name)
-    deal_file(os.listdir(path), name)

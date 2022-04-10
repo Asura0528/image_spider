@@ -5,8 +5,6 @@ import re
 import json
 import time
 import random
-# 解决验证码问题，经过测试实际使用过程中不会出验证码，所以没装的话可以屏蔽掉
-# import pytesseract
 from PIL import Image
 from io import BytesIO
 
@@ -25,11 +23,11 @@ from io import BytesIO
 
 
 class BaiDuPan(object):
-    def __init__(self):
+    def __init__(self, bdus, stoken):
         # 创建session并设置初始登录Cookie
         self.session = requests.session()
-        self.session.cookies['BDUSS'] = ''
-        self.session.cookies['STOKEN'] = ''
+        self.session.cookies['BDUSS'] = bdus
+        self.session.cookies['STOKEN'] = stoken
         self.headers = {
             'Host': 'pan.baidu.com',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36',
@@ -228,7 +226,7 @@ class BaiDuPan(object):
     7 获取提取码失败；8 获取加密cookie失败； 9 转存失败；
     '''
 
-    def saveShare(self, url, pwd=None, path='/', ):
+    def saveShare(self, url, pwd=None, path='/'):
         share_res = self.session.get(url, headers=self.headers)
         share_page = share_res.content.decode("utf-8")
         '''

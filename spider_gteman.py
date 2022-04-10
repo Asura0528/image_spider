@@ -1,8 +1,10 @@
+import os
 import re
-
 import requests
 import json
+from pan_api import PanApi
 from pan_save import BaiDuPan
+from deal_file import deal_file
 
 
 class SpiderGteman(object):
@@ -14,12 +16,23 @@ class SpiderGteman(object):
         :param download_name: 下载文件名
         :return:
         """
+        bduss = ''
+        stoken = ''
+        app_id = ""
+        app_key = ""
+        secret_key = ""
+        code = ""
+        self.path = '/spider_gteman/{}'.format(download_name)
         login_url = 'https://www.zteman.net/wp-json/jwt-auth/v1/token'
         data = {'username': username, 'password': password}
         res = requests.post(login_url, data)
         self.token = "Bearer " + json.loads(res.text).get("token")
         self.download_name = download_name
-        self.baidu_pan = BaiDuPan()
+        self.decompress_code = "gteman.cn"
+        self.baidu_pan = BaiDuPan(bduss, stoken)
+        self.pan_api = PanApi(download_name, app_id, app_key, secret_key, code, self.path)
+        if not os.path.exists('.' + self.path):
+            os.makedirs('.' + self.path)
 
     def get_id_list(self) -> list:
         """
@@ -55,11 +68,11 @@ class SpiderGteman(object):
         print(get_download_data_res.text.encode('utf-8'))
         redirect_token = json.loads(get_download_data_res.text).get('button').get('url')
         share_code = json.loads(get_download_data_res.text).get('button').get('attr').get('tq')
-        decompress_code = json.loads(get_download_data_res.text).get('button').get('attr').get('jy')
+        self.decompress_code = json.loads(get_download_data_res.text).get('button').get('attr').get('jy')
         # 重定向
         redirect_res = requests.get('https://www.zteman.net/redirect?token=' + redirect_token)
         share_url = redirect_res.url
-        print("share_url: " + share_url + "\nshare_code: " + share_code + "\ndecompress_code: " + decompress_code)
+        print("share_url: " + share_url + "\nshare_code: " + share_code + "\ndecompress_code: " + self.decompress_code)
         return share_url, share_code
 
     def get_url_and_code(self, post_id: str) -> tuple:
@@ -75,8 +88,8 @@ class SpiderGteman(object):
                                               headers=header)
         share_url = re.findall(r'href="(\S+)"', get_download_data_res.text.replace("\\", ""))[0]
         share_code = re.findall(r'<code>(\S+)</code>', get_download_data_res.text.replace("\\", ""))[0]
-        decompress_code = re.findall(r'<code>(\S+)</code>', get_download_data_res.text.replace("\\", ""))[1]
-        print("share_url: " + share_url + "\nshare_code: " + share_code + "\ndecompress_code: " + decompress_code)
+        self.decompress_code = re.findall(r'<code>(\S+)</code>', get_download_data_res.text.replace("\\", ""))[1]
+        print("share_url: " + share_url + "\nshare_code: " + share_code + "\ndecompress_code: " + self.decompress_code)
         return share_url, share_code
 
     def save_data(self, share_url: str, share_code: str):
@@ -86,13 +99,12 @@ class SpiderGteman(object):
         :param share_code: 提取码
         :return:
         """
-        baidu_pan = BaiDuPan()
-        info = baidu_pan.saveShare(share_url, share_code, '/spider_gteman/{}'.format(self.download_name))
+        info = self.baidu_pan.saveShare(share_url, share_code, self.path)
         print(info)
 
-    def vip_download(self):
+    def vip_save(self):
         """
-        VIP下载,具体看VIP等级,本月有每日五次
+        VIP转存,具体看VIP等级,本月有每日五次
         :return: 依据登录取得token拼接而成
         """
         share_id_list = self.get_vip_id_list()
@@ -101,8 +113,7 @@ class SpiderGteman(object):
         if not self.baidu_pan.verify_file(self.download_name, '/spider_gteman'):
             self.baidu_pan.create_dir('/spider_gteman/{}'.format(self.download_name))
         else:
-            print("已存在同名文件夹,请确认后重试")
-            return None
+            print("已存在同名文件夹")
         if len(share_id_list) == 1:
             share_id = share_id_list[0]
         else:
@@ -111,9 +122,9 @@ class SpiderGteman(object):
         share_url, share_code = self.get_vip_url_and_code(share_id)
         self.save_data(share_url, share_code)
 
-    def download(self):
+    def save(self):
         """
-        普通用户下载
+        普通用户转存
         :return:
         """
         share_id_list = self.get_id_list()
@@ -122,15 +133,22 @@ class SpiderGteman(object):
         if not self.baidu_pan.verify_file(self.download_name, '/spider_gteman'):
             self.baidu_pan.create_dir('/spider_gteman/{}'.format(self.download_name))
         else:
-            print("已存在同名文件夹,请确认后重试")
-            return None
+            print("已存在同名文件夹")
         for share_id in share_id_list:
             share_url, share_code = self.get_url_and_code(share_id)
             self.save_data(share_url, share_code)
 
+    def batch_download(self):
+        """
+        批量下载
+        :return:
+        """
+        self.pan_api.batch_download()
 
-if __name__ == '__main__':
-    spider_gteman = SpiderGteman("875778210@qq.com", "axlxmlt", "eliza喵喵")
-    # vip 一天只有五次
-    # spider_gteman.vip_download()
-    spider_gteman.download()
+    def deal(self):
+        """
+        下载文件处理
+        :return:
+        """
+        deal_path = '.' + self.path
+        deal_file(self.download_name, deal_path, self.decompress_code)
